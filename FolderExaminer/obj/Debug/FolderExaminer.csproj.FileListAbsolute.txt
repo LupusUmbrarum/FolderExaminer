@@ -1,0 +1,9 @@
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\bin\Debug\FolderExaminer.exe.config
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\bin\Debug\FolderExaminer.exe
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\bin\Debug\FolderExaminer.pdb
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\obj\Debug\FolderExaminer.csprojAssemblyReference.cache
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\obj\Debug\FolderExaminer.Form1.resources
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\obj\Debug\FolderExaminer.Properties.Resources.resources
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\obj\Debug\FolderExaminer.csproj.GenerateResource.cache
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\obj\Debug\FolderExaminer.exe
+C:\Users\ncowley\source\repos\FolderExaminer\FolderExaminer\obj\Debug\FolderExaminer.pdb
