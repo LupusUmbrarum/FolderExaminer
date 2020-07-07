@@ -28,10 +28,12 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.findFolderButton = new System.Windows.Forms.Button();
 			this.folderPathTextBox = new System.Windows.Forms.TextBox();
 			this.examineFolderButton = new System.Windows.Forms.Button();
 			this.treeView1 = new System.Windows.Forms.TreeView();
+			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
 			this.fbd = new System.Windows.Forms.FolderBrowserDialog();
 			this.SuspendLayout();
 			// 
@@ -70,10 +72,19 @@
 			this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.treeView1.ImageIndex = 0;
+			this.treeView1.ImageList = this.imageList1;
 			this.treeView1.Location = new System.Drawing.Point(12, 42);
 			this.treeView1.Name = "treeView1";
+			this.treeView1.SelectedImageIndex = 0;
 			this.treeView1.Size = new System.Drawing.Size(776, 396);
 			this.treeView1.TabIndex = 2;
+			// 
+			// imageList1
+			// 
+			this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+			this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
+			this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// Form1
 			// 
@@ -98,6 +109,7 @@
 		private System.Windows.Forms.Button examineFolderButton;
 		private System.Windows.Forms.TreeView treeView1;
 		private System.Windows.Forms.FolderBrowserDialog fbd;
+		private System.Windows.Forms.ImageList imageList1;
 	}
 }
 

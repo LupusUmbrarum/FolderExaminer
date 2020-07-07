@@ -11,10 +11,26 @@ using System.IO;
 
 namespace FolderExaminer
 {
+	// NOTE FOR ATTRIBUTION:
+	// The file icons in imageList1 were not created by me, they were a free download from
+	// https://www.vecteezy.com/vector-art/121958-colorful-file-icons
+	// designer:
+	// <a href="https://www.vecteezy.com/free-vector/pdf">Pdf Vectors by Vecteezy</a>
+
+	public enum FileType
+	{
+		EXCEL,
+		PDF,
+		POWERPOINT,
+		TEXT,
+		WORD,
+		FOLDER,
+		FILE,
+	}
+
 	public partial class Form1 : Form
 	{
 		private string currentPath = "";
-		private string folderToCheck = "";
 
 		public Form1()
 		{
@@ -34,14 +50,13 @@ namespace FolderExaminer
 		private void examineFolderButton_Click(object sender, EventArgs e)
 		{
 			currentPath = folderPathTextBox.Text;
-			folderToCheck = currentPath.Substring(currentPath.LastIndexOf('\\') + 1);
 
 			if(currentPath == "" || !isFolder(currentPath))
 			{
 				return;
 			}
 
-			examineFolder();
+			examineFolder(currentPath);
 		}
 
 		private void findFolder()
@@ -57,20 +72,74 @@ namespace FolderExaminer
 			return Directory.Exists(path);
 		}
 
+		private string getItemName(string path)
+		{
+			return path.Substring(path.LastIndexOf('\\') + 1);
+		}
+
+		private string getItemExtension(string path)
+		{
+			return path.Substring(path.LastIndexOf('.') + 1);
+		}
+
+		private int getImageIndex(string ext)
+		{
+			switch(ext)
+			{
+				case "xlsx":
+				case "xls":
+				case "xlsm":
+					return 0;
+				case "pdf":
+					return 1;
+				case "pptx":
+				case "ppt":
+					return 2;
+				case "txt":
+					return 3;
+				case "doc":
+				case "docx":
+					return 4;
+				default:
+					return 6;
+			}
+		}
+
+		private void examineFolder(string path)
+		{
+			Folder root = getFolders(path);
+
+			treeView1.Nodes.Clear();
+			treeView1.BeginUpdate();
+
+			treeView1.Nodes.Add(createTreeFromFolders(root));
+
+			treeView1.EndUpdate();
+			treeView1.ExpandAll();
+		}
+
 		private Folder getFolders(string path)
 		{
-			Folder folder = new Folder(path.Substring(path.LastIndexOf('\\') + 1));
+			Folder folder = new Folder(getItemName(path));
 
 			try
 			{
 				foreach(string s in Directory.GetFiles(path))
 				{
-					folder.files.Add(s);
+					Icon iconForFile = SystemIcons.WinLogo;
+
+					if (!imageList1.Images.ContainsKey(getItemExtension(s)))
+					{
+						iconForFile = Icon.ExtractAssociatedIcon(s);
+						imageList1.Images.Add(getItemExtension(s), iconForFile);
+					}
+
+					folder.files.Add(getItemName(s));
 				}
 
 				foreach(string s in Directory.GetDirectories(path))
 				{
-					folder.folders.Add(getFolders(path + "\\" + s));
+					folder.folders.Add(getFolders(s));
 				}
 			}
 			catch(Exception e)
@@ -81,109 +150,27 @@ namespace FolderExaminer
 			return folder;
 		}
 
-		private Folder getItemsInFolder(string path)
+		private TreeNode createTreeFromFolders(Folder root)
 		{
-			List<string> items = new List<string>();
-			Folder rootFolder = new Folder(folderToCheck);
+			TreeNode rootNode = new TreeNode(root.title);
 
-			try
+			int count = imageList1.Images.Count;
+			
+			foreach(Folder f in root.folders)
 			{
-				// get the files in the directory
-				foreach(string s in Directory.GetFiles(path))
-				{
-					items.Add(s.Substring(s.IndexOf(folderToCheck) + folderToCheck.Length + 1));
-					rootFolder.files.Add(s.Substring(s.IndexOf(folderToCheck) + folderToCheck.Length + 1));
-				}
-
-				// get the directories in the directory
-				foreach(string s in Directory.GetDirectories(path))
-				{
-					rootFolder.folders.Add(getItemsInFolder(s));
-				}
-			}
-			catch(Exception e)
-			{
-				MessageBox.Show(e.Message);
+				TreeNode newFolderNode = createTreeFromFolders(f);
+				newFolderNode.ImageIndex = 0;
+				rootNode.Nodes.Add(newFolderNode);
 			}
 
-			return rootFolder;
-		}
-
-		private List<Folder> createFolderStructure(string path)
-		{
-			List<Folder> folders = new List<Folder>();
-			/*
-			 * backup of getItemsInFolder
-			try
+			foreach(string s in root.files)
 			{
-				// get the files in the directory
-				foreach (string s in Directory.GetFiles(path))
-				{
-					items.Add(s.Substring(s.IndexOf(folderToCheck) + folderToCheck.Length + 1));
-					rootFolder.files.Add(s.Substring(s.IndexOf(folderToCheck) + folderToCheck.Length + 1));
-				}
-
-				// get the directories in the directory
-				foreach (string s in Directory.GetDirectories(path))
-				{
-					items.AddRange(getItemsInFolder(s));
-					rootFolder.folders.AddRange(getItemsInFolder(s));
-				}
-			}
-			catch (Exception e)
-			{
-				MessageBox.Show(e.Message);
-			}*/
-
-			return null;
-		}
-
-		private void examineFolderOld()
-		{
-			//List<string> items = getItemsInFolder(currentPath);
-			//List<Folder> folders = createFolderStructure(getItemsInFolder(currentPath));
-			Folder f = getItemsInFolder(currentPath);
-
-			if(items.Count > 0)
-			{
-				treeView1.BeginUpdate();
-				treeView1.Nodes.Clear();
-			}
-			else
-			{
-				return;
+				TreeNode newFileNode = new TreeNode(s);
+				newFileNode.ImageIndex = imageList1.Images.IndexOfKey(getItemExtension(s));
+				rootNode.Nodes.Add(newFileNode);
 			}
 
-			TreeNode rootDirectory = new TreeNode(folderToCheck);
-			treeView1.Nodes.Add(rootDirectory);
-
-			for(int i = 0; i < items.Count; i++)
-			{
-				TreeNode newNode = new TreeNode(items[i]);
-
-				rootDirectory.Nodes.Add(newNode);
-			}
-
-			treeView1.EndUpdate();
-
-			treeView1.Nodes[0].Expand();
-		}
-
-		private TreeNode createTreeFromFolders(string path)
-		{
-			TreeNode rootNode = new TreeNode(folderToCheck);
-
-			Folder rootFolder = getItemsInFolder(currentPath);
-
-			Folder currentFolder = rootFolder;
-
-			while(currentFolder != null)
-			{
-				foreach(Folder f in currentFolder.folders)
-				{
-
-				}
-			}
+			return rootNode;
 		}
 	}
 
