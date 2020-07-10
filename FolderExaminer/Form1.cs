@@ -107,24 +107,32 @@ namespace FolderExaminer
 
 		private void examineFolder(string path)
 		{
-			Folder root = getFolders(path);
-
 			treeView1.Nodes.Clear();
 			treeView1.BeginUpdate();
 
-			treeView1.Nodes.Add(createTreeFromFolders(root));
+			treeView1.Nodes.Add(createTree(path));
 
 			treeView1.EndUpdate();
 			treeView1.ExpandAll();
 		}
 
-		private Folder getFolders(string path)
+		private TreeNode createTree(string path)
 		{
-			Folder folder = new Folder(getItemName(path));
+			TreeNode rootNode = new TreeNode(getItemName(path));
 
 			try
 			{
-				foreach(string s in Directory.GetFiles(path))
+				// get folders
+				foreach (string s in Directory.GetDirectories(path))
+				{
+					TreeNode folderNode = createTree(s);
+					folderNode.ImageIndex = 0;
+					folderNode.SelectedImageIndex = 0;
+					rootNode.Nodes.Add(folderNode);
+				}
+
+				// get files
+				foreach (string s in Directory.GetFiles(path))
 				{
 					Icon iconForFile = SystemIcons.WinLogo;
 
@@ -134,40 +142,16 @@ namespace FolderExaminer
 						imageList1.Images.Add(getItemExtension(s), iconForFile);
 					}
 
-					folder.files.Add(getItemName(s));
-				}
+					TreeNode fileNode = new TreeNode(getItemName(s));
+					fileNode.SelectedImageIndex = imageList1.Images.IndexOfKey(getItemExtension(s));
+					fileNode.ImageIndex = imageList1.Images.IndexOfKey(getItemExtension(s));
 
-				foreach(string s in Directory.GetDirectories(path))
-				{
-					folder.folders.Add(getFolders(s));
+					rootNode.Nodes.Add(fileNode);
 				}
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				MessageBox.Show(e.Message);
-			}
-
-			return folder;
-		}
-
-		private TreeNode createTreeFromFolders(Folder root)
-		{
-			TreeNode rootNode = new TreeNode(root.title);
-
-			int count = imageList1.Images.Count;
-			
-			foreach(Folder f in root.folders)
-			{
-				TreeNode newFolderNode = createTreeFromFolders(f);
-				newFolderNode.ImageIndex = 0;
-				rootNode.Nodes.Add(newFolderNode);
-			}
-
-			foreach(string s in root.files)
-			{
-				TreeNode newFileNode = new TreeNode(s);
-				newFileNode.ImageIndex = imageList1.Images.IndexOfKey(getItemExtension(s));
-				rootNode.Nodes.Add(newFileNode);
 			}
 
 			return rootNode;
